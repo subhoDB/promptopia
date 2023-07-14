@@ -86,11 +86,13 @@ const VideoCall = () => {
         // Initialize Agora client
         client = agoraRTC.createClient({ mode: 'rtc', codec: 'vp8' });
 
+        await client.init('b6b121e15e504a808e7092382509aab1');
+
         // Generate a random channel name
         const channelName = Math.random().toString(36).substr(2, 10);
 
         // Join a channel
-        client.join(channelName, null, null, (uid) => {
+        await client.join(channelName, null, null, (uid) => {
           // Create a local stream
           localStream = agoraRTC.createStream({ streamID: uid, audio: true, video: true });
           // Initialize the local stream
@@ -118,6 +120,7 @@ const VideoCall = () => {
         });
       }
     };
+
 
     const handleUserGesture = () => {
       if (!isAudioContextResumed) {
@@ -150,13 +153,6 @@ const VideoCall = () => {
         client.removeAllListeners();
       }
     };
-
-    // return () => {
-    //   // Leave the channel and stop all streams
-    //   client && client.leave();
-    //   localStream && localStream.close();
-    //   client && client.removeAllListeners();
-    // };
   }, []);
 
   return (
