@@ -77,6 +77,8 @@ const VideoCall = () => {
   let localStream = null;
 
   useEffect(() => {
+    let isAudioContextResumed = false;
+
     const initAgora = async () => {
       if (typeof window !== 'undefined') {
         const agoraRTC = await import('agora-rtc-sdk');
@@ -84,8 +86,11 @@ const VideoCall = () => {
         // Initialize Agora client
         client = agoraRTC.createClient({ mode: 'rtc', codec: 'vp8' });
 
+        // Generate a random channel name
+        const channelName = Math.random().toString(36).substr(2, 10);
+
         // Join a channel
-        client.join('myChannelName', null, null, (uid) => {
+        client.join(channelName, null, null, (uid) => {
           // Create a local stream
           localStream = agoraRTC.createStream({ streamID: uid, audio: true, video: true });
           // Initialize the local stream
@@ -114,14 +119,44 @@ const VideoCall = () => {
       }
     };
 
-    initAgora();
+    const handleUserGesture = () => {
+      if (!isAudioContextResumed) {
+        // Resume the AudioContext after a user gesture
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const audioContext = new AudioContext();
+        audioContext.resume();
+        isAudioContextResumed = true;
+      }
+
+      // Initialize Agora
+      initAgora();
+    };
+
+    // initAgora();
+    // Add a click event listener to the document to capture user gesture
+    document.addEventListener('click', handleUserGesture);
 
     return () => {
+      // Remove the click event listener when the component is unmounted
+      document.removeEventListener('click', handleUserGesture);
+
       // Leave the channel and stop all streams
-      client && client.leave();
-      localStream && localStream.close();
-      client && client.removeAllListeners();
+      client.leave();
+      if (localStream) {
+        localStream.stop();
+        localStream.close();
+      }
+      if (client) {
+        client.removeAllListeners();
+      }
     };
+
+    // return () => {
+    //   // Leave the channel and stop all streams
+    //   client && client.leave();
+    //   localStream && localStream.close();
+    //   client && client.removeAllListeners();
+    // };
   }, []);
 
   return (
