@@ -1,10 +1,12 @@
-import VideoCall from "@components/VideoCall";
+"use client";
+import { useRouter } from 'next/router';
+import VideoCall from '@components/VideoCall';
 
+const JoinMeetingPage = () => {
+  const router = useRouter();
+  const { meetingLink } = router.query;
 
-export default function Home() {
-    return (
-      <div>
-        <VideoCall />
-      </div>
-    );
-}
+  return <VideoCall meetingLink={meetingLink} />;
+};
+
+export default JoinMeetingPage;
