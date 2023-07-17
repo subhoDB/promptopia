@@ -188,7 +188,7 @@ const VideoCall = ({ meetingLink }) => {
         // Initialize Agora client
         client = agoraRTC.createClient({ mode: 'rtc', codec: 'vp8' });
 
-        await client.init(process.env.APP_ID);
+        await client.init(process.env.AGORA_APP_ID);
 
         console.log(meetingLink);
 
