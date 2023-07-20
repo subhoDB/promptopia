@@ -220,41 +220,46 @@ function VideoCalling() {
 
     const JoinMeeting = async () => {
         try {
-            // Initialize AgoraRTC client
-            const client = AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' });
+            if (typeof window !== 'undefined') {
+                // Initialize AgoraRTC client
+                const client = AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' });
 
-            // Join a channel
-            await client.join(options.appId, options.channel, token, null);
+                // Join a channel
+                await client.join(options.appId, options.channel, token, null);
+                
+                // Create a local audio and video track
+                const tracks = await AgoraRTC.createMicrophoneAndCameraTracks();
 
-            // Create a local audio and video track
-            const tracks = await AgoraRTC.createMicrophoneAndCameraTracks();
+                // Initialize the local audio and video tracks
+                await Promise.all(tracks.map(track => track.setEnabled(true)));
 
-            // Initialize the local audio and video tracks
-            await Promise.all(tracks.map(track => track.setEnabled(true)));
+                // Publish the local audio and video tracks to the channel
+                await client.publish(tracks);
 
-            // Publish the local audio and video tracks to the channel
-            await client.publish(tracks);
+                // Subscribe to the remote streams
+                client.on('user-published', async (user, mediaType) => {
+                    await client.subscribe(user, mediaType);
 
-            // Subscribe to the remote streams
-            client.on('user-published', async (user, mediaType) => {
-                await client.subscribe(user, mediaType);
+                    if (mediaType === 'video') {
+                        const remoteVideo = document.createElement('video');
+                        remoteVideo.autoplay = true;
+                        remoteVideo.srcObject = user.videoTrack.play();
+                        document.body.appendChild(remoteVideo);
+                    }
+                });
 
-                if (mediaType === 'video') {
-                    const remoteVideo = document.createElement('video');
-                    remoteVideo.autoplay = true;
-                    remoteVideo.srcObject = user.videoTrack.play();
-                    document.body.appendChild(remoteVideo);
-                }
-            });
+                // Handle when a remote user leaves the channel
+                client.on('user-unpublished', (user) => {
+                    // Remove the remote video when a user leaves the channel
+                    const remoteVideo = document.querySelector(`[srcObject="${user.videoTrack.play()}"]`);
+                    remoteVideo && remoteVideo.remove();
+                });
 
-            // Handle when a remote user leaves the channel
-            client.on('user-unpublished', (user) => {
-                // Remove the remote video when a user leaves the channel
-                const remoteVideo = document.querySelector(`[srcObject="${user.videoTrack.play()}"]`);
-                remoteVideo && remoteVideo.remove();
-            });
-
-            return client; // Resolve the client object so it can be used outside the function
+                return client;
+            } else {
+                console.log('Window object is not defined (server environment)');
+                return null;
+            }
         } catch (error) {
             console.error('Error joining meeting:', error);
             throw error; // Reject the promise with the error so it can be caught outside the function
