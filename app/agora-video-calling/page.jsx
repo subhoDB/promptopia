@@ -42,7 +42,7 @@ function VideoCalling() {
 
     const generateToken = async () => {
         try {
-            const response = await fetch('http://localhost:4000/agora-create-token', {
+            const response = await fetch('https://63a2-103-189-130-97.ngrok-free.app/agora-create-token', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -58,12 +58,6 @@ function VideoCalling() {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
-            
-            const appId = 'b6b121e15e504a808e7092382509aab1';
-            const appCertificate = 'a093b7dafc764198a1e64f5bbbf00f3c';
-            const channelName = 'schedulehrmsinterview';
-            const uid = 0;
-            const userAccount = ""
 
             const data = await response.json();
             setToken(data.token);
@@ -224,7 +218,6 @@ function VideoCalling() {
     //         });
     // };
 
-
     const JoinMeeting = async () => {
         try {
             // Initialize AgoraRTC client
@@ -297,11 +290,6 @@ function VideoCalling() {
                         </div>
                     )}
 
-                    {/* <p className='font-santoshi font-semibold text-sm  pt-6 text-gray-500'>
-                        <Link href={`/video-calling/${token}`} className="flex gap-2 flex-center"> 
-                            {token} 
-                        </Link>
-                    </p> */}
                 </div>
             </h1>
         </section>
