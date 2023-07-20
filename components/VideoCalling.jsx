@@ -97,7 +97,7 @@ function VideoCalling() {
         <video id="remoteVideo2" autoPlay></video>
       </div>
 
-      <div id="controls" className='flex flex-center'>
+      <div id="controls" className='flex flex-center gap-2'>
         {/* Buttons and controls for video calling functionality */}
         <button class="outline_btn" id="joinButton">Join Call</button>
         <button class="px-5 py-1.5 text-sm bg-red-600 rounded-full text-white" id="leaveButton">Leave Call</button>
@@ -105,7 +105,7 @@ function VideoCalling() {
         <button class="outline_btn" id="shareScreenButton">Share Screen</button>
       </div>
     </div>
-  );  
+  );
 }
 
 export default VideoCalling;
