@@ -42,7 +42,7 @@ function VideoCalling() {
 
     const generateToken = async () => {
         try {
-            const response = await fetch('https://63a2-103-189-130-97.ngrok-free.app/agora-create-token', {
+            const response = await fetch('http://localhost:4000/agora-create-token', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
